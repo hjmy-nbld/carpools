@@ -1,0 +1,137 @@
+/**
+ * 消息列表页面样式（CSS Modules）
+ */
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding: 24rpx $page-padding;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+}
+
+.header {
+  padding: 8rpx 4rpx $spacing-md;
+}
+
+.headerTitle {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.headerSub {
+  display: block;
+  margin-top: 8rpx;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.sessionCard {
+  display: flex;
+  align-items: center;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+  transition: all $transition-fast;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.avatarGroup {
+  position: relative;
+  width: 96rpx;
+  height: 96rpx;
+  flex-shrink: 0;
+  margin-right: $spacing-md;
+}
+
+.avatarMain {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  border: 4rpx solid #fff;
+}
+
+.avatarSub {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-round;
+  border: 4rpx solid #fff;
+}
+
+.sessionInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.sessionTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sessionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+  flex: 1;
+  min-width: 0;
+  margin-right: $spacing-sm;
+}
+
+.sessionTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  flex-shrink: 0;
+}
+
+.sessionBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8rpx;
+}
+
+.sessionLast {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+  flex: 1;
+  min-width: 0;
+  margin-right: $spacing-sm;
+}
+
+.sessionStatus {
+  flex-shrink: 0;
+  font-size: $font-size-xs;
+  padding: 4rpx 14rpx;
+  border-radius: $radius-round;
+
+  &.active {
+    color: $color-success;
+    background: rgba(0, 180, 42, 0.1);
+  }
+  &.completed {
+    color: $color-text-tertiary;
+    background: $color-bg-hover;
+  }
+  &.canceled {
+    color: $color-error;
+    background: rgba(245, 63, 63, 0.08);
+  }
+}
+
+.arrow {
+  flex-shrink: 0;
+  margin-left: $spacing-sm;
+  color: $color-text-disabled;
+  font-size: $font-size-lg;
+}

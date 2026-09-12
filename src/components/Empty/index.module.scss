@@ -1,0 +1,60 @@
+/**
+ * Empty 空状态组件样式：居中布局、图标圆底与渐变操作按钮
+ */
+@use '@/styles/variables.scss' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 96rpx 48rpx;
+}
+
+.iconCircle {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $radius-round;
+  background: linear-gradient(180deg, #eef4ff 0%, #f7faff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-lg;
+}
+
+.iconDot {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-round;
+  border: 6rpx solid $color-primary-light;
+  background: rgba(30, 111, 255, 0.08);
+}
+
+.text {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.hint {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: $spacing-sm;
+  text-align: center;
+}
+
+.actionBtn {
+  @include button-reset;
+  margin-top: $spacing-xl;
+  height: $button-height-md;
+  padding: 0 56rpx;
+  border-radius: $radius-button;
+  background: $gradient-primary;
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}

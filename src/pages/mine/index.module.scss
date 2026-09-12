@@ -1,0 +1,213 @@
+/**
+ * 个人中心页面样式（CSS Modules）
+ */
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+}
+
+// 用户卡
+.userCard {
+  margin: 24rpx $page-padding;
+  padding: $spacing-lg;
+  border-radius: $radius-lg;
+  background: $gradient-primary;
+  box-shadow: 0 8rpx 24rpx rgba(30, 111, 255, 0.3);
+  display: flex;
+  align-items: center;
+
+  &:active {
+    opacity: 0.95;
+  }
+}
+
+.avatar {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: $radius-round;
+  border: 4rpx solid rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.userInfo {
+  flex: 1;
+  min-width: 0;
+  margin-left: $spacing-md;
+}
+
+.nickName {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: #fff;
+  display: flex;
+  align-items: center;
+}
+
+.verifyBadge {
+  margin-left: 12rpx;
+  font-size: $font-size-xs;
+  padding: 4rpx 14rpx;
+  border-radius: $radius-round;
+  white-space: nowrap;
+  font-weight: $font-weight-medium;
+
+  &.done {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+  &.todo {
+    background: #fff;
+    color: $color-warning;
+  }
+}
+
+.schoolText {
+  display: block;
+  margin-top: 10rpx;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+  @include text-ellipsis;
+}
+
+.arrowWhite {
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: $font-size-xl;
+}
+
+// 信用卡
+.creditCard {
+  margin: 0 $page-padding $spacing-md;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  padding: $spacing-lg;
+  display: flex;
+  align-items: center;
+}
+
+.creditMain {
+  flex: 1;
+}
+
+.creditLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.creditScore {
+  font-size: 56rpx;
+  font-weight: $font-weight-bold;
+  color: $color-credit;
+  line-height: 1.2;
+  margin-top: 4rpx;
+}
+
+.creditLevel {
+  display: inline-block;
+  margin-left: 12rpx;
+  font-size: $font-size-xs;
+  color: $color-credit;
+  background: rgba(247, 168, 35, 0.12);
+  padding: 4rpx 14rpx;
+  border-radius: $radius-round;
+  vertical-align: middle;
+}
+
+.creditStats {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.statNum {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.statLabel {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.creditRule {
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 2rpx solid $color-divider;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  line-height: $line-height-normal;
+}
+
+// 菜单
+.menuCard {
+  margin: 0 $page-padding;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  padding: 30rpx $spacing-lg;
+
+  &:not(:last-child) {
+    border-bottom: 2rpx solid $color-divider;
+  }
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.menuIcon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-md;
+  @include flex-center;
+  font-size: 30rpx;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.iconBlue {
+  background: $gradient-primary;
+}
+
+.iconCyan {
+  background: $gradient-school;
+}
+
+.iconOrange {
+  background: $gradient-warning;
+}
+
+.iconGray {
+  background: linear-gradient(135deg, #86909c 0%, #a9b2bd 100%);
+}
+
+.menuLabel {
+  flex: 1;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.menuValue {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-right: $spacing-sm;
+}
+
+.menuArrow {
+  color: $color-text-disabled;
+  font-size: $font-size-lg;
+}

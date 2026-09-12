@@ -1,0 +1,170 @@
+/**
+ * 我的行程页面样式（CSS Modules）
+ */
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+}
+
+// Tab 切换
+.tabs {
+  display: flex;
+  background: $color-bg-card;
+  padding: 16rpx $page-padding;
+  gap: $spacing-sm;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tab {
+  @include button-reset;
+  flex: 1;
+  height: 64rpx;
+  border-radius: $radius-button;
+  background: $color-bg-page;
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+.tabActive {
+  background: $gradient-primary;
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(30, 111, 255, 0.25);
+}
+
+.list {
+  padding: 8rpx $page-padding;
+}
+
+.tripCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  padding: $spacing-lg;
+  margin-top: $spacing-md;
+}
+
+.tripTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.tripStatus {
+  font-size: $font-size-xs;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+  font-weight: $font-weight-medium;
+
+  &.waiting {
+    color: $color-warning;
+    background: rgba(255, 136, 0, 0.1);
+  }
+  &.active {
+    color: $color-success;
+    background: rgba(0, 180, 42, 0.1);
+  }
+  &.completed {
+    color: $color-text-tertiary;
+    background: $color-bg-hover;
+  }
+  &.canceled {
+    color: $color-error;
+    background: rgba(245, 63, 63, 0.08);
+  }
+}
+
+.tripTitle {
+  display: block;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.tripMeta {
+  display: flex;
+  align-items: center;
+  margin-top: 10rpx;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+
+  .dot {
+    margin: 0 12rpx;
+    color: $color-text-disabled;
+  }
+  .price {
+    color: $color-price;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.tripFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 2rpx solid $color-divider;
+}
+
+.avatarStack {
+  display: flex;
+  align-items: center;
+}
+
+.tripAvatar {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  border: 3rpx solid #fff;
+  margin-left: -12rpx;
+
+  &:first-child {
+    margin-left: 0;
+  }
+}
+
+.tripActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.miniBtn {
+  @include button-reset;
+  height: 60rpx;
+  padding: 0 28rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+.miniPrimary {
+  background: $gradient-primary;
+  color: #fff;
+}
+
+.miniGhost {
+  background: $color-bg-card;
+  color: $color-text-secondary;
+  border: 2rpx solid $color-border;
+}
+
+.miniSuccess {
+  background: $gradient-success;
+  color: #fff;
+}

@@ -1,0 +1,33 @@
+/**
+ * SectionCard 卡片容器样式：白底圆角、轻阴影及标题栏两端对齐布局
+ */
+@use '@/styles/variables.scss' as *;
+
+.card {
+  width: 100%;
+  box-sizing: border-box;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+
+  .title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    line-height: $line-height-tight;
+  }
+
+  .extra {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+}

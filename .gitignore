@@ -1,0 +1,26 @@
+# ===== 前端 =====
+node_modules/
+dist/
+dist-weapp/
+.DS_Store
+*.log
+
+# ===== 后端 =====
+backend/.venv/
+backend/uploads/
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
+*.pyo
+
+# ===== IDE / 工具 =====
+.idea/
+.vscode/
+.trae/
+
+# ===== 敏感：微信小程序密钥绝对不能上传 =====
+.auth/
+
+# ===== 依赖锁文件（保留，用于团队复现版本）=====
+# package-lock.json  /  不要注释掉这行
+# backend/requirements.txt 已在版本控制内

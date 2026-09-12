@@ -1,0 +1,53 @@
+// ============================================
+// 主题配色变量 —— 「同路人」校园即时拼车
+// 风格：可信蓝 + 活力青，安全 / 年轻 / 高效
+// ============================================
+
+// 品牌主题色：可信蓝
+$color-primary: #1e6fff;
+$color-primary-light: #4d94ff;
+$color-primary-dark: #0f56d9;
+
+// 辅助色：活力青（反向路线 / 轻强调）
+$color-accent: #00b8a3;
+$color-accent-light: #33d6c2;
+$color-accent-dark: #009684;
+
+// 功能色
+$color-success: #00b42a;
+$color-warning: #ff8800;
+$color-error: #f53f3f;
+$color-info: #1e6fff;
+
+// 背景色
+$color-bg-page: #f3f6fb;
+$color-bg-card: #ffffff;
+$color-bg-hover: #f2f5fa;
+
+// 文本色
+$color-text-primary: #1d2129;
+$color-text-secondary: #4e5969;
+$color-text-tertiary: #86909c;
+$color-text-disabled: #c9cdd4;
+$color-text-white: #ffffff;
+
+// 边框色
+$color-border: #e6eaf2;
+$color-divider: #f0f3f8;
+
+// ===== 业务扩展变量 =====
+// 路线方向色
+$color-route-metro: #3b82f6; // 地铁站 → 学校
+$color-route-school: #06b6d4; // 学校 → 地铁站
+
+// 价格 / 信用
+$color-price: #ff6b2c;
+$color-credit: #f7a823;
+
+// 渐变
+$gradient-primary: linear-gradient(135deg, #1e6fff 0%, #4d94ff 100%);
+$gradient-metro: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
+$gradient-school: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%);
+$gradient-header: linear-gradient(180deg, #e8f1ff 0%, #f3f6fb 100%);
+$gradient-success: linear-gradient(135deg, #00b42a 0%, #4cd964 100%);
+$gradient-warning: linear-gradient(135deg, #ff8800 0%, #ffb04d 100%);

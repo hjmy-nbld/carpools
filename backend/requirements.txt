@@ -1,0 +1,7 @@
+# 同路人 Python 后端依赖
+# 安装：pip install -r requirements.txt（建议使用 backend/.venv 虚拟环境）
+fastapi>=0.110.0          # Web 框架，自动生成 /docs 接口文档
+uvicorn[standard]>=0.29.0 # ASGI 服务器
+sqlalchemy>=2.0.0         # ORM
+python-multipart>=0.0.9   # /api/upload 图片上传的 multipart 表单支持
+pymysql>=1.1.0            # MySQL 驱动（连接串 mysql+pymysql://）

@@ -1,0 +1,265 @@
+/**
+ * 匹配等待页面样式（CSS Modules）
+ */
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx $page-padding 64rpx;
+}
+
+// ===== 雷达动画 =====
+.radarWrap {
+  position: relative;
+  width: 420rpx;
+  height: 420rpx;
+  margin: 48rpx 0 32rpx;
+  @include flex-center;
+}
+
+.radarRing {
+  position: absolute;
+  border-radius: $radius-round;
+  border: 2rpx solid rgba(30, 111, 255, 0.25);
+  animation: radarPulse 2.4s ease-out infinite;
+}
+
+.ring1 {
+  width: 280rpx;
+  height: 280rpx;
+}
+
+.ring2 {
+  width: 280rpx;
+  height: 280rpx;
+  animation-delay: 0.8s;
+}
+
+.ring3 {
+  width: 280rpx;
+  height: 280rpx;
+  animation-delay: 1.6s;
+}
+
+@keyframes radarPulse {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.radarCore {
+  position: relative;
+  width: 280rpx;
+  height: 280rpx;
+  border-radius: $radius-round;
+  background: radial-gradient(circle, rgba(30, 111, 255, 0.12) 0%, rgba(30, 111, 255, 0.04) 70%);
+  border: 2rpx solid rgba(30, 111, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.radarSweep {
+  position: absolute;
+  inset: 0;
+  border-radius: $radius-round;
+  animation: radarRotate 2.2s linear infinite;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 4rpx;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(30, 111, 255, 0.7) 0%, rgba(30, 111, 255, 0) 100%);
+    transform-origin: bottom center;
+  }
+}
+
+@keyframes radarRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.radarCenter {
+  position: relative;
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: $radius-round;
+  background: $gradient-primary;
+  box-shadow: 0 8rpx 24rpx rgba(30, 111, 255, 0.4);
+  @include flex-center;
+  z-index: 2;
+}
+
+.radarCenterText {
+  color: #fff;
+  font-size: 44rpx;
+  font-weight: $font-weight-bold;
+}
+
+// 匹配到的同学头像（雷达上闪烁）
+.peerDot {
+  position: absolute;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: $radius-round;
+  border: 6rpx solid #fff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 180, 42, 0.4);
+  z-index: 3;
+  animation: peerPop 0.4s ease-out;
+}
+
+.peerDot1 {
+  top: 40rpx;
+  right: 56rpx;
+}
+
+.peerDot2 {
+  bottom: 56rpx;
+  left: 48rpx;
+  animation-delay: 0.2s;
+}
+
+@keyframes peerPop {
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+// ===== 文案 =====
+.statusTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.statusSub {
+  margin-top: 12rpx;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.timerText {
+  margin-top: 8rpx;
+  font-size: $font-size-lg;
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+  font-variant-numeric: tabular-nums;
+}
+
+// 轮询连续失败的内联提示（不弹窗，避免刷屏）
+.netHint {
+  margin-top: 8rpx;
+  font-size: $font-size-xs;
+  color: $color-error;
+}
+
+// 条件卡
+.condCard {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: $spacing-xl;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  padding: $spacing-lg;
+}
+
+.condRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14rpx 0;
+
+  .condLabel {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+  .condValue {
+    font-size: $font-size-sm;
+    color: $color-text-primary;
+    font-weight: $font-weight-medium;
+    max-width: 420rpx;
+    text-align: right;
+  }
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 2rpx solid $color-divider;
+}
+
+.progressAvatars {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-round;
+  border: 4rpx solid #fff;
+  margin-left: -12rpx;
+
+  &:first-child {
+    margin-left: 0;
+  }
+}
+
+.progressText {
+  margin-left: $spacing-sm;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+// 提示
+.tipCard {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: $spacing-md;
+  padding: 24rpx;
+  border-radius: $radius-md;
+  background: rgba(30, 111, 255, 0.06);
+  font-size: $font-size-sm;
+  color: $color-primary-dark;
+  line-height: $line-height-normal;
+}
+
+// 底部按钮
+.footer {
+  margin-top: auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding-top: $spacing-xl;
+}
+
+.cancelBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-card;
+  border: 2rpx solid $color-border;
+  color: $color-text-secondary;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}

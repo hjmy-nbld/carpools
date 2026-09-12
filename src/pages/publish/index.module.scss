@@ -1,0 +1,452 @@
+/**
+ * 发起拼车页面样式（CSS Modules）
+ */
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding: 24rpx $page-padding 200rpx;
+}
+
+// ===== 方向切换 =====
+.dirSwitch {
+  display: flex;
+  background: $color-bg-card;
+  border-radius: $radius-button;
+  padding: 8rpx;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.dirOption {
+  flex: 1;
+  height: 72rpx;
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+.dirOptionMetroActive {
+  background: $gradient-metro;
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(37, 99, 235, 0.3);
+}
+
+.dirOptionSchoolActive {
+  background: $gradient-school;
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(8, 145, 178, 0.3);
+}
+
+// ===== 卡片 =====
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.stepTitle {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+
+  .stepNo {
+    width: 44rpx;
+    height: 44rpx;
+    border-radius: $radius-round;
+    background: $gradient-primary;
+    color: #fff;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    @include flex-center;
+    margin-right: $spacing-sm;
+    flex-shrink: 0;
+  }
+  .stepName {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+  }
+  .stepHint {
+    margin-left: auto;
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+  }
+}
+
+// 集合点
+.stationName {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: $spacing-md 0 $spacing-sm;
+}
+
+.exitList {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.exitItem {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  border-radius: $radius-md;
+  border: 2rpx solid $color-border;
+  background: $color-bg-page;
+  transition: all $transition-base;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.exitItemActive {
+  border-color: $color-primary;
+  background: rgba(30, 111, 255, 0.06);
+}
+
+.radio {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: $radius-round;
+  border: 3rpx solid $color-text-disabled;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.radioActive {
+  border-color: $color-primary;
+  border-width: 10rpx;
+}
+
+.exitInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.exitName {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.exitMeta {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 6rpx;
+}
+
+// 集合点加载 / 失败 / 空状态
+.stationsTip {
+  display: block;
+  padding: 32rpx 0;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.stationsError {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32rpx 0;
+}
+
+.stationsErrorText {
+  font-size: $font-size-sm;
+  color: $color-error;
+  text-align: center;
+  line-height: $line-height-normal;
+}
+
+.retryBtn {
+  margin-top: 20rpx;
+  padding: 12rpx 48rpx;
+  border-radius: $radius-button;
+  border: 2rpx solid $color-primary;
+  color: $color-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+// GPS 验证
+.gpsBox {
+  border-radius: $radius-md;
+  padding: 24rpx;
+  margin-bottom: $spacing-md;
+}
+
+.gpsIdle {
+  background: $color-bg-page;
+}
+
+.gpsOk {
+  background: rgba(0, 180, 42, 0.08);
+  border: 2rpx solid rgba(0, 180, 42, 0.25);
+}
+
+.gpsFail {
+  background: rgba(245, 63, 63, 0.06);
+  border: 2rpx solid rgba(245, 63, 63, 0.25);
+}
+
+.gpsStatusText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  display: block;
+
+  .ok { color: $color-success; }
+  .fail { color: $color-error; }
+  .idle { color: $color-text-tertiary; }
+}
+
+.gpsDesc {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 8rpx;
+  line-height: $line-height-normal;
+}
+
+.gpsCoord {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-top: 6rpx;
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.gpsMap {
+  width: 100%;
+  height: 400rpx;
+  margin-top: 20rpx;
+  border-radius: $radius-md;
+  border: 2rpx solid $color-border;
+}
+
+.gpsBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  background: $gradient-primary;
+  color: #fff;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+// 表单
+.formItem {
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.formLabel {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  margin-bottom: 12rpx;
+}
+
+.formInput {
+  width: 100%;
+  box-sizing: border-box;
+  height: 88rpx;
+  padding: 0 24rpx;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.priceInputWrap {
+  display: flex;
+  align-items: center;
+  height: 88rpx;
+  padding: 0 24rpx;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+
+  .priceInput {
+    flex: 1;
+    height: 88rpx;
+    font-size: $font-size-md;
+    color: $color-price;
+    font-weight: $font-weight-semibold;
+  }
+  .priceUnit {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+}
+
+.photoRow {
+  display: flex;
+  align-items: center;
+}
+
+.photoBox {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $radius-md;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.photoImg {
+  width: 160rpx;
+  height: 160rpx;
+}
+
+.photoAdd {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $radius-md;
+  border: 2rpx dashed $color-border;
+  background: $color-bg-page;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .plus {
+    font-size: 56rpx;
+    color: $color-text-disabled;
+    line-height: 1;
+  }
+  .addText {
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+    margin-top: 8rpx;
+  }
+}
+
+.photoTip {
+  margin-left: $spacing-md;
+  flex: 1;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  line-height: $line-height-normal;
+}
+
+// 开关行
+.switchRow {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-top: 2rpx solid $color-divider;
+
+  .switchLabel {
+    flex: 1;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+  }
+  .switchHint {
+    display: block;
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+    margin-top: 4rpx;
+  }
+}
+
+// 人数选择
+.sizeGrid {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.sizeCard {
+  flex: 1;
+  padding: 28rpx 24rpx;
+  border-radius: $radius-md;
+  border: 2rpx solid $color-border;
+  background: $color-bg-page;
+  text-align: center;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+.sizeCardActive {
+  border-color: $color-primary;
+  background: rgba(30, 111, 255, 0.06);
+}
+
+.sizeNum {
+  font-size: 44rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: 1.2;
+}
+
+.sizeDesc {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 10rpx;
+}
+
+// 底部操作栏
+.footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 16rpx $page-padding;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: $shadow-float;
+}
+
+.submitBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $gradient-primary;
+  color: #fff;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.submitBtnDisabled {
+  background: $color-text-disabled;
+}
