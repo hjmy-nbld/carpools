@@ -9,10 +9,10 @@ import { View, Text, Image, Button, Input, ScrollView } from '@tarojs/components
 import Taro, { useLoad } from '@tarojs/taro'
 import classnames from 'classnames'
 import { callFunction, uploadImage } from '@/services/cloud'
-import { CHAT_POLL_INTERVAL } from '@/config'
+import { CHAT_POLL_INTERVAL, CREDIT_DAILY_REWARD_LIMIT } from '@/config'
 import { useUserStore } from '@/store/useUserStore'
 import RouteTag from '@/components/RouteTag'
-import type { ChatMessage, ChatSession, MessageType } from '@/types'
+import type { ChatMessage, ChatSession, CompleteRideResult, MessageType } from '@/types'
 import styles from './index.module.scss'
 
 const QUICK_PHRASES = [
@@ -33,7 +33,7 @@ function normalizeTime(t: number | string): number {
 }
 
 export default function ChatDetailPage() {
-  const { user } = useUserStore()
+  const { user, setUser, refresh } = useUserStore()
   const [groupId, setGroupId] = useState('')
   const [session, setSession] = useState<ChatSession | null>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -149,17 +149,29 @@ export default function ChatDetailPage() {
   const handleFinish = () => {
     Taro.showModal({
       title: '确认完成本次拼车？',
-      content: '完成后可对同行同学进行评价，信用分 +1；临时群聊记录将为你保留。',
+      content: '完成后可对同行同学进行评价，信用分 +1（每天最多加 2 次，两次间隔至少 3 小时）；临时群聊记录将为你保留。',
       confirmText: '完成拼车',
       confirmColor: '#00b42a',
       success: async (res) => {
         if (!res.confirm) return
         try {
-          await callFunction('completeRide', { groupId })
+          const data = await callFunction<CompleteRideResult>('completeRide', { groupId })
           setSession((prev) => (prev ? { ...prev, status: 'completed' } : prev))
+          // 同步最新信用分 / 加分记录到全局 store
+          refresh()
+            .then((u) => setUser(u))
+            .catch((err) => console.error('[ChatDetail] refresh profile failed:', err))
+          const finishContent =
+            data.reason === 'already_completed'
+              ? '本次拼车已完成。'
+              : data.credited
+                ? '信用分 +1！现在去给同行的同学做个评价吧～'
+                : data.reason === 'daily_limit'
+                  ? `今日信用分奖励已达上限（每天最多 ${CREDIT_DAILY_REWARD_LIMIT} 次），本次不加分，明天 00:00 后恢复。仍可对同行同学进行评价～`
+                  : '距上次加分不足 3 小时，本次不加分。仍可对同行同学进行评价～'
           Taro.showModal({
             title: '拼车完成，感谢同行！',
-            content: '现在去给同行的同学做个评价吧～',
+            content: finishContent,
             confirmText: '去评价',
             cancelText: '稍后',
             confirmColor: '#1e6fff',
@@ -186,17 +198,47 @@ export default function ChatDetailPage() {
   const handleLeave = () => {
     Taro.showModal({
       title: '确认退出本次拼车？',
-      content: '协商阶段退出将扣除 5 点信用分，临时聊天将关闭。',
+      content:
+        '协商阶段退出将扣除 5 点信用分，且 2 分钟内无法再次匹配。\n信用分低于 75 分将冻结账号 30 天，低于 70 分将注销账号。',
       confirmText: '确认退出',
       cancelText: '再想想',
       confirmColor: '#f53f3f',
       success: async (res) => {
         if (!res.confirm) return
         try {
-          const data = await callFunction<{ creditDelta: number }>('leaveGroup', { groupId })
+          const data = await callFunction<{
+            creditScore: number
+            creditDelta: number
+            status: 'normal' | 'warned' | 'frozen' | 'deleted'
+            frozenUntil?: number | null
+            lastLeaveAt?: number | null
+          }>('leaveGroup', { groupId })
           setSession((prev) => (prev ? { ...prev, status: 'canceled' } : prev))
-          Taro.showToast({ title: `已退出，信用分 ${data.creditDelta}`, icon: 'none' })
-          setTimeout(() => Taro.navigateBack(), 1200)
+          // 同步最新信用状态到全局 store（驱动首页 / 发布页的冻结与冷却拦截）
+          if (user) {
+            setUser({
+              ...user,
+              creditScore: data.creditScore,
+              status: data.status,
+              frozenUntil: data.frozenUntil ?? null,
+              lastLeaveAt: data.lastLeaveAt ?? null
+            })
+          }
+          if (data.status === 'frozen' || data.status === 'deleted') {
+            Taro.showModal({
+              title: data.status === 'frozen' ? '账号已冻结' : '账号已注销',
+              content:
+                data.status === 'frozen'
+                  ? `信用分已低于 75 分，账号冻结 30 天，冻结期内无法发起拼车。`
+                  : '信用分已低于 70 分，账号已被注销，无法继续使用。',
+              showCancel: false,
+              confirmColor: '#f53f3f',
+              success: () => Taro.navigateBack()
+            })
+          } else {
+            Taro.showToast({ title: `已退出，信用分 ${data.creditDelta}，2 分钟内无法匹配`, icon: 'none' })
+            setTimeout(() => Taro.navigateBack(), 1500)
+          }
         } catch (err) {
           console.error('[ChatDetail] leave failed:', err)
           Taro.showToast({ title: (err as Error).message || '操作失败，请重试', icon: 'none' })

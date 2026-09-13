@@ -5,6 +5,33 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+-- ---------- admin_logs ----------
+DROP TABLE IF EXISTS `admin_logs`;
+
+CREATE TABLE admin_logs (
+	id VARCHAR(64) NOT NULL, 
+	admin_id VARCHAR(64), 
+	admin_name VARCHAR(64), 
+	action VARCHAR(64), 
+	target VARCHAR(256), 
+	detail TEXT, 
+	created_at BIGINT, 
+	PRIMARY KEY (id)
+);
+
+-- ---------- admins ----------
+DROP TABLE IF EXISTS `admins`;
+
+CREATE TABLE admins (
+	id VARCHAR(64) NOT NULL, 
+	username VARCHAR(64) NOT NULL, 
+	password_hash VARCHAR(128) NOT NULL, 
+	salt VARCHAR(32) NOT NULL, 
+	name VARCHAR(64), 
+	created_at BIGINT, 
+	PRIMARY KEY (id)
+);
+
 -- ---------- announcements ----------
 DROP TABLE IF EXISTS `announcements`;
 
@@ -44,6 +71,7 @@ CREATE TABLE reports (
 	description TEXT, 
 	status VARCHAR(16), 
 	created_at BIGINT, 
+	admin_note TEXT, 
 	PRIMARY KEY (id)
 );
 
@@ -109,6 +137,7 @@ CREATE TABLE stations (
 	id VARCHAR(64) NOT NULL, 
 	direction VARCHAR(32), 
 	name VARCHAR(128) NOT NULL, 
+	to_name VARCHAR(128), 
 	type VARCHAR(16), 
 	exits JSON, 
 	sort INTEGER, 
@@ -126,6 +155,9 @@ CREATE TABLE users (
 	school VARCHAR(128), 
 	credit_score INTEGER, 
 	status VARCHAR(16), 
+	frozen_until BIGINT, 
+	last_leave_at BIGINT, 
+	credit_rewards JSON, 
 	default_wait_location VARCHAR(128), 
 	default_outfit VARCHAR(128), 
 	default_photo TEXT, 
@@ -136,17 +168,20 @@ CREATE TABLE users (
 );
 
 -- ---------- 索引 ----------
+CREATE INDEX ix_admin_logs_created_at ON admin_logs (created_at);
+CREATE INDEX ix_admin_logs_admin_id ON admin_logs (admin_id);
+CREATE UNIQUE INDEX ix_admins_username ON admins (username);
 CREATE INDEX ix_messages_group_id ON messages (group_id);
 CREATE INDEX ix_messages_created_at ON messages (created_at);
-CREATE INDEX ix_reports_group_id ON reports (group_id);
 CREATE INDEX ix_reports_reporter_openid ON reports (reporter_openid);
-CREATE INDEX ix_reviews_from_openid ON reviews (from_openid);
+CREATE INDEX ix_reports_group_id ON reports (group_id);
 CREATE INDEX ix_reviews_group_id ON reviews (group_id);
+CREATE INDEX ix_reviews_from_openid ON reviews (from_openid);
 CREATE INDEX ix_ride_groups_status ON ride_groups (status);
-CREATE INDEX ix_ride_requests_group_id ON ride_requests (group_id);
-CREATE INDEX ix_ride_requests_created_at ON ride_requests (created_at);
-CREATE INDEX ix_ride_requests_openid ON ride_requests (openid);
 CREATE INDEX ix_ride_requests_status ON ride_requests (status);
+CREATE INDEX ix_ride_requests_group_id ON ride_requests (group_id);
+CREATE INDEX ix_ride_requests_openid ON ride_requests (openid);
+CREATE INDEX ix_ride_requests_created_at ON ride_requests (created_at);
 CREATE INDEX ix_stations_direction ON stations (direction);
 
 SET FOREIGN_KEY_CHECKS = 1;

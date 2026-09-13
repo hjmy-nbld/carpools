@@ -450,3 +450,73 @@
 .submitBtnDisabled {
   background: $color-text-disabled;
 }
+
+// 账号冻结拦截卡
+.blockCard {
+  margin: $spacing-md $page-padding;
+  padding: 56rpx $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  @include flex-center;
+  flex-direction: column;
+}
+
+.blockIcon {
+  font-size: 72rpx;
+}
+
+.blockTitle {
+  margin-top: $spacing-md;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-error;
+}
+
+.blockText {
+  margin-top: 12rpx;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  text-align: center;
+  line-height: $line-height-normal;
+}
+
+.blockRemain {
+  margin-top: $spacing-md;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-error;
+}
+
+.blockSub {
+  margin-top: 12rpx;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  text-align: center;
+}
+
+// 中途退出冷却提示条
+.cooldownBar {
+  margin: $spacing-md $page-padding 0;
+  padding: 20rpx $spacing-lg;
+  border-radius: $radius-lg;
+  background: rgba(247, 168, 35, 0.12);
+  border: 2rpx solid rgba(247, 168, 35, 0.45);
+  display: flex;
+  align-items: center;
+}
+
+.cooldownText {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: #b26a00;
+}
+
+.cooldownTime {
+  flex-shrink: 0;
+  margin-left: $spacing-sm;
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-warning;
+  font-variant-numeric: tabular-nums;
+}

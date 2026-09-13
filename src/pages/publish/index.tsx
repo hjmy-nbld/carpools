@@ -6,11 +6,19 @@
  */
 import { useEffect, useState } from 'react'
 import { View, Text, Input, Button, Image, Switch, Map } from '@tarojs/components'
-import Taro, { useLoad } from '@tarojs/taro'
+import Taro, { useLoad, useDidShow } from '@tarojs/taro'
+import dayjs from 'dayjs'
 import classnames from 'classnames'
 import { callFunction, uploadImage } from '@/services/cloud'
 import { useUserStore } from '@/store/useUserStore'
 import { verifyLocation, GPS_RADIUS } from '@/utils/location'
+import {
+  freezeRemainMs,
+  matchCooldownRemainMs,
+  formatRemain,
+  formatCountdown
+} from '@/utils/credit'
+import { CREDIT_FREEZE_DAYS, CREDIT_FREEZE_SCORE } from '@/config'
 import type { Direction, GpsVerifyResult, Station, StationExit } from '@/types'
 import styles from './index.module.scss'
 
@@ -21,7 +29,7 @@ interface SelectedExit {
 }
 
 export default function PublishPage() {
-  const { user } = useUserStore()
+  const { user, init } = useUserStore()
   const [direction, setDirection] = useState<Direction>('metro2school')
   const [stations, setStations] = useState<Station[]>([])
   const [stationsLoading, setStationsLoading] = useState(false)
@@ -40,10 +48,26 @@ export default function PublishPage() {
   const [targetSize, setTargetSize] = useState<2 | 3>(2)
   const [submitting, setSubmitting] = useState(false)
 
+  // 每秒刷新一次，驱动冻结 / 冷却倒计时
+  const [nowTick, setNowTick] = useState(Date.now())
+
   useLoad((options) => {
     const dir = (options?.direction as Direction) || 'metro2school'
     setDirection(dir)
   })
+
+  useDidShow(() => {
+    init().catch((err) => console.error('[Publish] init failed:', err))
+  })
+
+  useEffect(() => {
+    const timer = setInterval(() => setNowTick(Date.now()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  // 冻结剩余 / 中途退出冷却剩余（毫秒）
+  const frozenMs = freezeRemainMs(user, nowTick)
+  const cooldownMs = user ? matchCooldownRemainMs(user, nowTick) : 0
 
   useEffect(() => {
     loadStations(direction)
@@ -132,6 +156,19 @@ export default function PublishPage() {
   }
 
   const handleSubmit = async () => {
+    if (frozenMs > 0) {
+      Taro.showModal({
+        title: '账号冻结中',
+        content: `信用分低于 ${CREDIT_FREEZE_SCORE} 分，账号已冻结 ${CREDIT_FREEZE_DAYS} 天，${formatRemain(frozenMs)}后自动解冻，暂无法发起拼车。`,
+        showCancel: false,
+        confirmColor: '#f53f3f'
+      })
+      return
+    }
+    if (cooldownMs > 0) {
+      Taro.showToast({ title: `退出冷却中，请等待 ${formatRemain(cooldownMs)}`, icon: 'none' })
+      return
+    }
     if (!selected) {
       Taro.showToast({ title: '请选择集合点', icon: 'none' })
       return
@@ -188,7 +225,7 @@ export default function PublishPage() {
     }
   }
 
-  const canSubmit = !!selected && !!gps?.passed && !!price
+  const canSubmit = !!selected && !!gps?.passed && !!price && cooldownMs === 0
 
   return (
     <View className={styles.page}>
@@ -208,6 +245,34 @@ export default function PublishPage() {
         </View>
       </View>
 
+      {/* 账号冻结：冻结期内隐藏发起表单 */}
+      {frozenMs > 0 && (
+        <View className={styles.blockCard}>
+          <Text className={styles.blockIcon}>⛔</Text>
+          <Text className={styles.blockTitle}>账号冻结中</Text>
+          <Text className={styles.blockText}>
+            信用分低于 {CREDIT_FREEZE_SCORE} 分，账号已冻结 {CREDIT_FREEZE_DAYS} 天
+          </Text>
+          <Text className={styles.blockRemain}>剩余 {formatRemain(frozenMs)}</Text>
+          <Text className={styles.blockText}>
+            预计 {dayjs(user?.frozenUntil || 0).format('YYYY-MM-DD HH:mm')} 自动解冻
+          </Text>
+          <Text className={styles.blockSub}>冻结期内无法发起拼车，到期后请通过完成行程恢复信用</Text>
+        </View>
+      )}
+
+      {/* 中途退出 2 分钟匹配冷却提示 */}
+      {frozenMs === 0 && cooldownMs > 0 && (
+        <View className={styles.cooldownBar}>
+          <Text className={styles.cooldownText}>
+            中途退出冷却中，{formatRemain(cooldownMs)}后可再次发起匹配
+          </Text>
+          <Text className={styles.cooldownTime}>{formatCountdown(cooldownMs)}</Text>
+        </View>
+      )}
+
+      {frozenMs === 0 && (
+      <>
       {/* Step 1：集合点 */}
       <View className={styles.card}>
         <View className={styles.stepTitle}>
@@ -432,9 +497,15 @@ export default function PublishPage() {
           loading={submitting}
           onClick={handleSubmit}
         >
-          {gps?.passed ? '立即拼车，进入匹配' : '完成以上步骤后发起拼车'}
+          {cooldownMs > 0
+            ? `匹配冷却中（${formatCountdown(cooldownMs)}）`
+            : gps?.passed
+              ? '立即拼车，进入匹配'
+              : '完成以上步骤后发起拼车'}
         </Button>
       </View>
+      </>
+      )}
     </View>
   )
 }

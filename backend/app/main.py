@@ -11,6 +11,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import UPLOAD_DIR
 from .deps import ApiError
+from .routers.admin import router as admin_router
 from .routers.api import router
 
 app = FastAPI(title="同路人 · 校园拼车后端", version="1.0.0")
@@ -35,7 +36,14 @@ async def api_error_handler(request: Request, exc: ApiError):
 
 
 app.include_router(router)
+app.include_router(admin_router)
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+
+# 管理员后台静态页面（HTML/CSS/JS，无构建）
+from pathlib import Path
+_admin_dir = Path(__file__).resolve().parent.parent / "admin"
+if _admin_dir.exists():
+    app.mount("/admin", StaticFiles(directory=str(_admin_dir), html=True), name="admin")
 
 
 @app.get("/")

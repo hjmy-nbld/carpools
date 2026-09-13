@@ -78,6 +78,51 @@
   font-size: $font-size-xl;
 }
 
+// 信用预警 / 冻结横幅
+.noticeCard {
+  margin: 0 $page-padding $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  border-radius: $radius-lg;
+  border: 2rpx solid;
+}
+
+.noticeTitle {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  margin-bottom: 8rpx;
+}
+
+.noticeText {
+  display: block;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+}
+
+.noticeWarn {
+  background: rgba(247, 168, 35, 0.1);
+  border-color: rgba(247, 168, 35, 0.4);
+
+  .noticeTitle {
+    color: $color-warning;
+  }
+  .noticeText {
+    color: #b26a00;
+  }
+}
+
+.noticeFrozen {
+  background: rgba(245, 63, 63, 0.08);
+  border-color: rgba(245, 63, 63, 0.4);
+
+  .noticeTitle {
+    color: $color-error;
+  }
+  .noticeText {
+    color: #cb2634;
+  }
+}
+
 // 信用卡
 .creditCard {
   margin: 0 $page-padding $spacing-md;
@@ -210,4 +255,25 @@
 .menuArrow {
   color: $color-text-disabled;
   font-size: $font-size-lg;
+}
+
+// 退出登录
+.logoutCard {
+  margin: $spacing-lg $page-padding 0;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+}
+
+.logoutBtn {
+  @include flex-center;
+  padding: 30rpx $spacing-lg;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-error;
+
+  &:active {
+    background: $color-bg-hover;
+  }
 }

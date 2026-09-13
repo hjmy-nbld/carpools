@@ -10,12 +10,15 @@ from fastapi import APIRouter, Depends, File, Request, Response, UploadFile
 from sqlalchemy.orm import Session
 
 from ..config import (
-    COMPLETE_CREDIT_REWARD,
-    CREDIT_MAX,
-    CREDIT_MIN,
+    CREDIT_FREEZE_SCORE,
+    CREDIT_DELETE_SCORE,
+    CREDIT_WARN_SCORE,
+    FREEZE_DAYS,
     LEAVE_CREDIT_PENALTY,
+    LEAVE_MATCH_COOLDOWN_SECONDS,
     UPLOAD_DIR,
 )
+from ..credit import apply_credit, format_remaining, grant_completion_reward
 from ..database import get_db
 from ..deps import ApiError, current_user, ok, require_user
 from ..matching import _find_human_peer, form_group, try_match
@@ -104,6 +107,10 @@ def login(
         target = db.query(User).filter(User.openid == openid).first()
         if target is None:
             raise ApiError("测试账号未初始化，请先运行 python seed.py")
+
+    # 已注销账号（信用分低于销号阈值）禁止登录
+    if target is not None and target.status == "deleted":
+        raise ApiError("账号因信用分低于 70 分已被注销，无法继续使用", http_status=401)
 
     if target is None:
         # 注册：只要求填写真实姓名
@@ -200,6 +207,24 @@ def create_ride_request(
 ):
     event = event or {}
     now = now_ms()
+
+    # 冻结期内禁止发起匹配（到期解冻已由 current_user 依赖自动完成）
+    if user.status == "frozen":
+        frozen_until = user.frozen_until or now
+        raise ApiError(
+            f"账号已被冻结（信用分低于 {CREDIT_FREEZE_SCORE} 分），"
+            f"{format_remaining(frozen_until - now)}后自动解冻，暂无法发起拼车"
+        )
+
+    # 中途退出后的 2 分钟匹配冷却
+    if user.last_leave_at:
+        cooldown_end = user.last_leave_at + LEAVE_MATCH_COOLDOWN_SECONDS * 1000
+        if now < cooldown_end:
+            raise ApiError(
+                f"中途退出后 {LEAVE_MATCH_COOLDOWN_SECONDS // 60} 分钟内无法再次匹配，"
+                f"请等待 {format_remaining(cooldown_end - now)}"
+            )
+
     req = RideRequest(
         id=gen_id("req"),
         openid=user.openid,
@@ -416,7 +441,18 @@ def leave_group(
     if req is not None:
         req.status = "canceled"
 
-    user.credit_score = max(CREDIT_MIN, user.credit_score - LEAVE_CREDIT_PENALTY)
+    # 中途退出：记录退出时间（2 分钟匹配冷却）+ 扣信用分并联动警告 / 冻结 / 销号
+    user.last_leave_at = now
+    apply_credit(user, -LEAVE_CREDIT_PENALTY, now)
+
+    # 按处置结果拼接系统通知文案
+    extra = f"，且 {LEAVE_MATCH_COOLDOWN_SECONDS // 60} 分钟内无法再次匹配"
+    if user.status == "deleted":
+        extra += f"；当前信用分已低于 {CREDIT_DELETE_SCORE} 分，账号已被注销"
+    elif user.status == "frozen":
+        extra += f"；信用分低于 {CREDIT_FREEZE_SCORE} 分，账号已冻结 {FREEZE_DAYS} 天"
+    elif user.status == "warned":
+        extra += f"；信用分低于 {CREDIT_WARN_SCORE} 分已被警告，请珍惜信用"
     db.add(
         Message(
             id=gen_id("msg"),
@@ -425,17 +461,22 @@ def leave_group(
             from_name="系统通知",
             avatar="",
             type="system",
-            content=f"你已退出本次拼车，临时聊天将关闭，信用分 -{LEAVE_CREDIT_PENALTY}。",
+            content=f"你已退出本次拼车，临时聊天将关闭，信用分 -{LEAVE_CREDIT_PENALTY}{extra}。",
             created_at=now,
         )
     )
     db.commit()
     db.refresh(group)
+    db.refresh(user)
     return ok(
         {
             "group": group_obj(group),
             "creditScore": user.credit_score,
             "creditDelta": -LEAVE_CREDIT_PENALTY,
+            "status": user.status,
+            "frozenUntil": user.frozen_until,
+            "lastLeaveAt": user.last_leave_at,
+            "matchCooldownUntil": user.last_leave_at + LEAVE_MATCH_COOLDOWN_SECONDS * 1000,
         }
     )
 
@@ -452,18 +493,44 @@ def complete_ride(
         raise ApiError("拼车组不存在")
 
     now = now_ms()
-    group.status = "completed"
-    group.completed_at = now
     req = (
         db.query(RideRequest)
         .filter(RideRequest.group_id == group_id, RideRequest.openid == user.openid)
         .first()
     )
+    # 幂等：同一拼车重复点击完成，直接返回现状，不再增加完成数 / 信用分（防重复刷分）
+    if req is not None and req.status == "completed":
+        return ok(
+            {
+                "group": group_obj(group),
+                "credited": False,
+                "reason": "already_completed",
+                "waitSeconds": 0,
+                "nextAvailableAt": None,
+                "todayCount": 0,
+            }
+        )
+
+    group.status = "completed"
+    group.completed_at = now
     if req is not None:
         req.status = "completed"
 
     user.finished_count = (user.finished_count or 0) + 1
-    user.credit_score = min(CREDIT_MAX, user.credit_score + COMPLETE_CREDIT_REWARD)
+    # 信用分 +1 防刷：每日（UTC+8）最多 2 次，两次间隔至少 3 小时；不满足则本次不加分
+    reward = grant_completion_reward(user, now)
+    if reward["credited"]:
+        content = "拼车已完成，感谢同行！信用分 +1，别忘了给同行的同学做个评价～"
+    elif reward["reason"] == "daily_limit":
+        content = (
+            "拼车已完成，感谢同行！今日信用分奖励已达上限（每天最多 2 次），本次不再加分，"
+            "明天 00:00 后恢复。"
+        )
+    else:
+        content = (
+            f"拼车已完成，感谢同行！距上次加分不足 3 小时，本次不再加分；"
+            f"请等待 {format_remaining(reward['nextAvailableAt'] - now)}后再完成下一行程。"
+        )
     db.add(
         Message(
             id=gen_id("msg"),
@@ -472,13 +539,13 @@ def complete_ride(
             from_name="系统通知",
             avatar="",
             type="system",
-            content="拼车已完成，感谢同行！别忘了给同行的同学做个评价～",
+            content=content,
             created_at=now,
         )
     )
     db.commit()
     db.refresh(group)
-    return ok({"group": group_obj(group)})
+    return ok({"group": group_obj(group), **reward})
 
 
 # ---------------- 行程 / 评价 / 举报 ----------------

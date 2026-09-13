@@ -53,7 +53,8 @@ def seed_stations(db):
             id="metro_xishankou",
             direction="metro2school",
             name="昌平西山口站",
-            type="metro",
+            to_name="北京化工大学（昌平校区）",
+            type="subway",
             sort=1,
             exits=[
                 {"id": "exit_a", "name": "A 口", "latitude": 40.244810, "longitude": 116.193813, "distanceToSchool": 4.5},
@@ -63,8 +64,9 @@ def seed_stations(db):
             id="school_buct",
             direction="school2metro",
             name="北京化工大学（昌平校区）",
+            to_name="昌平西山口站",
             type="school",
-            sort=1,
+            sort=2,
             # 校门坐标为 GCJ02（与微信 getLocation type='gcj02' 一致），现场实测取点
             exits=[
                 {"id": "gate_south", "name": "南门（正门）", "latitude": 40.247457, "longitude": 116.150646},

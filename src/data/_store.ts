@@ -55,7 +55,8 @@ export const MOCK_STATIONS: Record<Direction, Station[]> = {
     {
       id: 'metro_xishankou',
       name: '昌平西山口站',
-      type: 'metro',
+      toName: '北京化工大学（昌平校区）',
+      type: 'subway',
       exits: [
         { id: 'exit_a', name: 'A 口', latitude: 40.244810, longitude: 116.193813, distanceToSchool: 4.5 }
       ]
@@ -65,6 +66,7 @@ export const MOCK_STATIONS: Record<Direction, Station[]> = {
     {
       id: 'school_buct',
       name: '北京化工大学（昌平校区）',
+      toName: '昌平西山口站',
       type: 'school',
       exits: [
         // GCJ02 坐标，现场实测取点，与 backend/seed.py 保持一致

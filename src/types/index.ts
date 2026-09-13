@@ -5,8 +5,8 @@
 /** 出行方向：地铁站 → 学校 / 学校 → 地铁站 */
 export type Direction = 'metro2school' | 'school2metro'
 
-/** 账号状态 */
-export type UserStatus = 'normal' | 'warned' | 'restricted' | 'banned'
+/** 账号状态：normal 正常 / warned 信用警告(<85) / frozen 冻结(<75,30天) / deleted 已销号(<70) */
+export type UserStatus = 'normal' | 'warned' | 'frozen' | 'deleted'
 
 export interface UserInfo {
   openid: string
@@ -18,6 +18,12 @@ export interface UserInfo {
   /** 信用分 */
   creditScore: number
   status: UserStatus
+  /** 冻结截止时间（毫秒时间戳），仅 status=frozen 时有值 */
+  frozenUntil?: number | null
+  /** 最近一次中途退出时间（毫秒时间戳），2 分钟匹配冷却判定依据 */
+  lastLeaveAt?: number | null
+  /** 成功加信用分的时间戳列表（防刷：UTC+8 每日≤2 次、间隔≥3 小时） */
+  creditRewards?: number[]
   /** 默认拼车信息 */
   defaultWaitLocation?: string
   defaultOutfit?: string
@@ -41,7 +47,9 @@ export interface StationExit {
 export interface Station {
   id: string
   name: string
-  type: 'metro' | 'school'
+  /** 目的地名称（admin 端维护，小程序端暂未使用） */
+  toName?: string
+  type: 'subway' | 'school'
   exits: StationExit[]
 }
 
@@ -161,4 +169,17 @@ export interface GpsVerifyResult {
   longitude: number
   /** H5 预览为模拟定位 */
   mocked?: boolean
+}
+
+/** 完成拼车结果（credited=false 时为触发加分防刷或重复完成） */
+export interface CompleteRideResult {
+  group: RideGroup
+  /** 本次是否实际加了信用分 */
+  credited: boolean
+  /** 未加分原因：daily_limit 当日次数已达上限 / interval 间隔不足 3 小时 / already_completed 重复完成 */
+  reason: 'daily_limit' | 'interval' | 'already_completed' | null
+  waitSeconds: number
+  nextAvailableAt?: number | null
+  /** 今日已加分次数 */
+  todayCount: number
 }

@@ -5,19 +5,15 @@
  */
 import { View, Text, Image } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
+import dayjs from 'dayjs'
 import { useUserStore } from '@/store/useUserStore'
 import { isLoggedIn } from '@/services/cloud'
+import { creditLevel, freezeRemainMs, formatRemain } from '@/utils/credit'
+import { CREDIT_DELETE_SCORE, CREDIT_FREEZE_DAYS, CREDIT_FREEZE_SCORE, CREDIT_WARN_SCORE } from '@/config'
 import styles from './index.module.scss'
 
-function creditLevel(score: number): string {
-  if (score >= 95) return '信用优秀'
-  if (score >= 90) return '信用良好'
-  if (score >= 80) return '信用一般'
-  return '需要改进'
-}
-
 export default function MinePage() {
-  const { user, init, refresh } = useUserStore()
+  const { user, init, refresh, logout } = useUserStore()
 
   useDidShow(() => {
     init()
@@ -44,7 +40,7 @@ export default function MinePage() {
     Taro.showModal({
       title: '信用与安全规则',
       content:
-        '1. 完成一次拼车信用分 +1；协商阶段恶意退出信用分 -5。\n2. 被核实恶意毁约、语言攻击、虚假身份，将视情节被警告、限制匹配或封禁。\n3. 平台不做线上强制实名：请自行在企业微信中搜索同行同学的真实姓名并对话核验；拼车全程使用临时群聊，无需交换私人联系方式。',
+        '1. 信用分初始 100、上限 100：完成一次拼车 +1（每天最多加 2 次，两次间隔至少 3 小时，防止刷分）；协商阶段中途退出 -5，且 2 分钟内无法再次匹配。\n2. 信用分低于 85 分将被警告；低于 75 分冻结账号 30 天（冻结期内无法发起拼车，到期自动解冻）；低于 70 分账号将被注销。\n3. 被核实恶意毁约、语言攻击、虚假身份，将视情节从严处置。\n4. 平台不做线上强制实名：请自行在企业微信中搜索同行同学的真实姓名并对话核验；拼车全程使用临时群聊，无需交换私人联系方式。',
       showCancel: false,
       confirmColor: '#1e6fff'
     })
@@ -68,6 +64,27 @@ export default function MinePage() {
     })
   }
 
+  // 退出登录：二次确认后清除本地令牌与缓存用户，并跳转登录页
+  const handleLogout = () => {
+    Taro.showModal({
+      title: '退出登录',
+      content: '退出后需要重新登录才能使用拼车功能，确定退出吗？',
+      confirmText: '退出',
+      confirmColor: '#fa5151',
+      success: (res) => {
+        if (!res.confirm) return
+        logout()
+        Taro.showToast({ title: '已退出登录', icon: 'success' })
+        setTimeout(() => {
+          Taro.navigateTo({ url: '/pages/login/index' })
+        }, 600)
+      }
+    })
+  }
+
+  const frozenMs = freezeRemainMs(user)
+  const showWarn = !!user && user.status !== 'frozen' && user.creditScore < CREDIT_WARN_SCORE
+
   return (
     <View className={styles.page}>
       {/* 用户卡 */}
@@ -84,6 +101,29 @@ export default function MinePage() {
         </View>
         {!user?.realName && <Text className={styles.arrowWhite}>›</Text>}
       </View>
+
+      {/* 冻结提示 */}
+      {user?.status === 'frozen' && frozenMs > 0 && (
+        <View className={`${styles.noticeCard} ${styles.noticeFrozen}`}>
+          <Text className={styles.noticeTitle}>账号冻结中</Text>
+          <Text className={styles.noticeText}>
+            信用分低于 {CREDIT_FREEZE_SCORE} 分，账号已冻结 {CREDIT_FREEZE_DAYS} 天，剩余
+            {formatRemain(frozenMs)}自动解冻（约 {dayjs(user.frozenUntil || 0).format('MM-DD HH:mm')}）。
+            冻结期内无法发起拼车，到期后请通过完成行程恢复信用。
+          </Text>
+        </View>
+      )}
+
+      {/* 信用预警 */}
+      {showWarn && user.status !== 'frozen' && (
+        <View className={`${styles.noticeCard} ${styles.noticeWarn}`}>
+          <Text className={styles.noticeTitle}>信用预警</Text>
+          <Text className={styles.noticeText}>
+            当前信用分 {user.creditScore}，低于 85 分已被警告；低于 {CREDIT_FREEZE_SCORE} 分将冻结
+            {CREDIT_FREEZE_DAYS} 天，低于 {CREDIT_DELETE_SCORE} 分将注销账号，请珍惜信用。
+          </Text>
+        </View>
+      )}
 
       {/* 信用分 */}
       <View className={styles.creditCard}>
@@ -145,6 +185,15 @@ export default function MinePage() {
           <Text className={styles.menuArrow}>›</Text>
         </View>
       </View>
+
+      {/* 退出登录（仅已登录时展示） */}
+      {isLoggedIn() && (
+        <View className={styles.logoutCard}>
+          <View className={styles.logoutBtn} onClick={handleLogout}>
+            <Text>退出登录</Text>
+          </View>
+        </View>
+      )}
     </View>
   )
 }

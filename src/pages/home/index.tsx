@@ -8,7 +8,8 @@ import { View, Text, Button, Swiper, SwiperItem } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { callFunction, isLoggedIn } from '@/services/cloud'
 import { useUserStore } from '@/store/useUserStore'
-import { GPS_RADIUS } from '@/config'
+import { GPS_RADIUS, CREDIT_FREEZE_DAYS, CREDIT_FREEZE_SCORE } from '@/config'
+import { freezeRemainMs, matchCooldownRemainMs, formatRemain } from '@/utils/credit'
 import RouteTag from '@/components/RouteTag'
 import type { Announcement, Direction, TripRecord } from '@/types'
 import styles from './index.module.scss'
@@ -49,6 +50,23 @@ export default function HomePage() {
     if (!user) {
       // 从未注册过的用户先去登记姓名，其余直接进入发起拼车
       goLogin()
+      return
+    }
+    // 冻结期内禁止发起
+    const frozenMs = freezeRemainMs(user)
+    if (frozenMs > 0) {
+      Taro.showModal({
+        title: '账号冻结中',
+        content: `信用分低于 ${CREDIT_FREEZE_SCORE} 分，账号已冻结 ${CREDIT_FREEZE_DAYS} 天，${formatRemain(frozenMs)}后自动解冻，暂无法发起拼车。`,
+        showCancel: false,
+        confirmColor: '#f53f3f'
+      })
+      return
+    }
+    // 中途退出后 2 分钟匹配冷却
+    const cooldownMs = matchCooldownRemainMs(user)
+    if (cooldownMs > 0) {
+      Taro.showToast({ title: `退出冷却中，${formatRemain(cooldownMs)}后可再匹配`, icon: 'none' })
       return
     }
     Taro.navigateTo({ url: `/pages/publish/index?direction=${direction}` })

@@ -37,7 +37,23 @@ WAIT_TIMEOUT_SECONDS = 90
 LEAVE_CREDIT_PENALTY = 5
 COMPLETE_CREDIT_REWARD = 1
 CREDIT_MIN = 0
-CREDIT_MAX = 120
+CREDIT_MAX = 100
+# 联动处置阈值（严格小于触发）：
+#   <85 警告（仅提示，功能正常）；<75 冻结 30 天（冻结期内无法发起匹配）；<70 销号
+CREDIT_WARN_SCORE = 85
+CREDIT_FREEZE_SCORE = 75
+CREDIT_DELETE_SCORE = 70
+FREEZE_DAYS = 30
+
+# 中途退出（匹配成功后 leaveGroup）后的匹配冷却时间（秒）
+LEAVE_MATCH_COOLDOWN_SECONDS = 120
+
+# 信用分加分防刷（完成行程 +1 时校验）：
+#   每个自然日（UTC+8）最多加 2 次，且第 2 次距第 1 次至少间隔 3 小时
+CREDIT_DAILY_REWARD_LIMIT = 2
+CREDIT_REWARD_MIN_INTERVAL_SECONDS = 3 * 60 * 60
+# 业务时区（东八区）：自然日按 UTC+8 的 00:00 切分，避免部署机时区漂移
+BUSINESS_TZ_OFFSET_MS = 8 * 60 * 60 * 1000
 
 # 服务端口（仅文档/脚本引用）
 SERVER_PORT = int(os.environ.get("CARPOOL_PORT", "8000"))

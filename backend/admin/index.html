@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>同路人 · 管理员后台</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" />
+</head>
+<body>
+  <!-- 登录遮罩 -->
+  <div id="loginMask" class="login-mask">
+    <div class="login-card">
+      <h2><i class="fa fa-shield"></i> 管理员登录</h2>
+      <p class="login-sub">同路人校园拼车后台管理系统</p>
+      <form id="loginForm">
+        <div class="form-row">
+          <i class="fa fa-user"></i>
+          <input id="loginUser" type="text" placeholder="管理员账号" autocomplete="username" />
+        </div>
+        <div class="form-row">
+          <i class="fa fa-lock"></i>
+          <input id="loginPass" type="password" placeholder="密码" autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn-primary btn-block">登 录</button>
+        <p id="loginErr" class="err-msg"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- 主体布局 -->
+  <div id="app" class="app hidden">
+    <!-- 左侧导航 -->
+    <aside class="sidebar">
+      <div class="logo">
+        <i class="fa fa-car"></i>
+        <span>同路人后台</span>
+      </div>
+      <nav id="navList" class="nav-list">
+        <a class="nav-item" data-page="dashboard"><i class="fa fa-dashboard"></i><span>数据看板</span></a>
+        <a class="nav-item" data-page="reports"><i class="fa fa-flag"></i><span>举报中心</span><em id="reportBadge" class="badge hidden">0</em></a>
+        <a class="nav-item" data-page="users"><i class="fa fa-users"></i><span>用户管理</span></a>
+        <a class="nav-item" data-page="trips"><i class="fa fa-road"></i><span>行程管理</span></a>
+        <a class="nav-item" data-page="reviews"><i class="fa fa-star"></i><span>评价查看</span></a>
+        <a class="nav-item" data-page="stations"><i class="fa fa-map-marker"></i><span>站点管理</span></a>
+        <a class="nav-item" data-page="announcements"><i class="fa fa-bullhorn"></i><span>公告管理</span></a>
+        <a class="nav-item" data-page="logs"><i class="fa fa-history"></i><span>操作日志</span></a>
+      </nav>
+      <div class="sidebar-foot">
+        <span id="adminName">管理员</span>
+        <button id="logoutBtn" class="btn-link"><i class="fa fa-sign-out"></i> 退出</button>
+      </div>
+    </aside>
+
+    <!-- 右侧内容 -->
+    <main class="main">
+      <header class="topbar">
+        <h1 id="pageTitle">数据看板</h1>
+        <div class="topbar-actions">
+          <button id="refreshBtn" class="btn-ghost"><i class="fa fa-refresh"></i> 刷新</button>
+        </div>
+      </header>
+      <div id="content" class="content"></div>
+    </main>
+  </div>
+
+  <!-- 通用模态框 -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-mask"></div>
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3 id="modalTitle">标题</h3>
+        <button class="modal-close" id="modalClose"><i class="fa fa-times"></i></button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+      <div id="modalFoot" class="modal-foot"></div>
+    </div>
+  </div>
+
+  <!-- 图片预览 -->
+  <div id="imgViewer" class="img-viewer hidden">
+    <img id="imgViewerImg" alt="" />
+    <button class="img-viewer-close"><i class="fa fa-times"></i></button>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

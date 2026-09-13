@@ -7,7 +7,7 @@
 import Taro from '@tarojs/taro'
 import { create } from 'zustand'
 import type { UserInfo } from '@/types'
-import { callFunction, getToken } from '@/services/cloud'
+import { callFunction, getToken, clearToken } from '@/services/cloud'
 import { API_ENABLED } from '@/config'
 
 const STORAGE_KEY = 'carpool_user'
@@ -22,6 +22,8 @@ interface UserState {
   setUser: (user: UserInfo) => void
   /** 重新拉取最新资料（姓名 / 信用分等） */
   refresh: () => Promise<UserInfo>
+  /** 退出登录：清除本地令牌与缓存用户，恢复未登录状态 */
+  logout: () => void
 }
 
 function cacheUser(user: UserInfo | null) {
@@ -80,6 +82,12 @@ export const useUserStore = create<UserState>((set) => ({
     cacheUser(user)
     set({ user })
     return user
+  },
+
+  logout: () => {
+    clearToken()
+    cacheUser(null)
+    set({ user: null, ready: true })
   }
 }))
 
