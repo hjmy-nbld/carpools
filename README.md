@@ -2,7 +2,7 @@
 
 面向高校学生的**固定路线即时拼车**微信小程序：在「地铁站 ↔ 学校」之间，学生到达集合点后一键发起拼车，系统在同方向、同集合点的同学之间即时匹配，自动建立临时群聊沟通集合细节，行程结束后互评积累信用分。注册仅需填写真实姓名，身份真实性由同学在企业微信中自行搜索核验。
 
-> 核心场景：出地铁站回学校 / 出校门赶地铁 · GPS 200 米围栏验证 · 真实姓名 + 企业微信自行核验 · 2～3 人即时成团
+> 核心场景：出地铁站回学校 / 出校门赶地铁 · GPS 300 米围栏验证 · 真实姓名 + 企业微信自行核验 · 2～3 人即时成团
 
 - **前端**：Taro 4.1.9 + React 18 + TypeScript 5 + Sass/CSS Modules（编译为微信小程序，也可 H5 预览）
 - **后端**：FastAPI + SQLAlchemy 2 + **MySQL 8**（Python 3.13，Bearer Token 鉴权）
@@ -10,13 +10,93 @@
 
 ---
 
-## 一、功能流程
+## 一、快速上手（新设备从零搭建）
+
+### 0. 前置环境（一次性安装）
+
+| 软件 | 版本 | 备注 |
+|---|---|---|
+| Node.js | ≥18 LTS | nodejs.org，装完重开终端 |
+| Python | ≥3.10 | 安装时勾选 Add to PATH |
+| MySQL 8.x | — | root 密码默认 123456，不同可环境变量覆盖 |
+| 微信开发者工具 | 稳定版 | 微信官方下载 |
+| Git | 任意 | git-scm.com |
+
+### 1. 克隆并安装前端依赖
+
+```powershell
+git clone https://github.com/<你的用户名>/carpools.git
+cd carpools
+npm install
+```
+
+### 2. 搭建并启动后端
+
+```powershell
+# 建库（一次性）
+mysql -u root -p123456 -e "CREATE DATABASE IF NOT EXISTS carpool DEFAULT CHARACTER SET utf8mb4;"
+
+cd backend
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+python seed.py        # 建表 + 种子数据；重置数据用 python seed.py --reset
+python run.py         # 启动；双击 run.bat 等价
+```
+
+看到 `[OK] MySQL 连接正常` + `Uvicorn running on 0.0.0.0:8000` 即成功（MySQL 未启动会退出并提示）。MySQL 密码非 123456 时，先 `$env:CARPOOL_MYSQL_PASSWORD='你的密码'` 再执行 seed / run。
+
+### 3. 配置后端地址并编译
+
+改 (src/config/index.ts) 的 `API_BASE_URL`（唯一配置点）：
+
+- 模拟器调试：`http://127.0.0.1:8000`
+- 真机调试：`ipconfig` 查电脑局域网 IP，填 `http://<电脑IP>:8000`（手机热点同理，需与电脑同网络）
+
+校园网可能变更ip，需要ipconfig 查当前 IP
+
+Ctrl+C 停掉 Taro，重新 
+cd E:\carpools
+npm run dev:weapp（监听模式，进程常驻-开发期频繁改代码-需 Ctrl+C 重启才生效）
+
+微信开发者工具 → 清缓存 → 编译
+
+改完执行 
+cd E:\carpools
+npm.cmd run build:weapp （一次性构建，编译完退出-调试完验证/交付-直接跑就生效）
+改完必须重新编译（否则真机仍连旧地址）
+
+```powershell
+npm run build:weapp      # 产物输出 dist-weapp/；PowerShell 报「禁止运行脚本」先执行 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+### 4. 微信开发者工具
+
+1. 导入项目根目录（AppID 填自己的测试号；miniprogramRoot 已指向 `dist-weapp/`）。
+2. 详情 → 本地设置 → 勾选「不校验合法域名、web-view、TLS 以及 HTTPS 证书」（`urlCheck:false` 已写入配置）。
+3. 每次重新构建后点「编译」。真机调试用工具栏「**真机调试**」（预览包会拦截 HTTP 局域网请求）；连不上时先用手机浏览器打开 `http://<电脑IP>:8000/docs` 验证连通，再排查防火墙 8000 端口。
+
+### 5. 测试账号（免注册，已带信用分与历史行程）
+
+登录页「测试账号一键登录」卡片直接点选；接口方式 `POST /api/login`，body `{"testAccount":"test1"}`。
+
+| 参数 | 昵称 | 真实姓名 |
+|---|---|---|
+| `test1` | 测试同学A | 张艺 |
+| `test2` | 测试同学B | 李一诺 |
+| `test3` | 测试同学C | 王星河 |
+
+新用户走正常注册：`{"realName":"张三"}`（头像昵称为选填）。
+
+---
+
+## 二、功能流程
 
 ```text
 注册/登录（头像昵称选填，仅需真实姓名）
    └─ 平台不做线上实名认证 —— 请自行在企业微信搜索同学姓名并对话核验
         └─ 选择出行方向（地铁→学校 / 学校→地铁）与集合点（地铁口/校门）
-             └─ GPS 200 米围栏验证（小程序真机为真实定位，H5 为模拟通过）
+             └─ GPS 300 米围栏验证（小程序真机为真实定位，H5 为模拟通过）
                   └─ 填写拼车信息（报价、等候位置、着装描述、辨认照片，可存为默认）
                        └─ 选择人数（2 人 / 3 人）→ 进入匹配池
                             └─ 匹配成功 → 临时群聊（文字 / 图片 / 快捷语 / 系统通知）
@@ -30,66 +110,6 @@
 **信用机制**：初始 100 分，完成行程 +1，恶意退出 −5，区间 0～120。
 
 **当前集合点（GCJ02 坐标）**：昌平西山口站 A 口（地铁→学校）；北京化工大学昌平校区 南门 / 东门 / 西门（学校→地铁）。
-
----
-
-## 二、快速开始
-
-### 1. 启动后端（FastAPI + MySQL）
-
-前置：已安装 MySQL 8，root 密码 `123456`（不同则改 `backend/app/config.py` 默认值或设环境变量 `CARPOOL_MYSQL_PASSWORD`）。
-
-```powershell
-# 首次：建库
-mysql -u root -p123456 -e "CREATE DATABASE IF NOT EXISTS carpool DEFAULT CHARACTER SET utf8mb4;"
-
-# 初始化 Python 虚拟环境并安装依赖（已装好可跳过）
-cd backend
-python -m venv .venv
-.\.venv\Scripts\pip install -r requirements.txt
-
-# 建表 + 写入种子数据（3 测试账号 / 机器人 / 站点 / 公告 / 历史行程）
-.\.venv\Scripts\python seed.py
-
-# 启动（双击 run.bat 等价）
-.\.venv\Scripts\python run.py
-```
-
-启动后：接口服务 `http://127.0.0.1:8000`，Swagger 文档 `http://127.0.0.1:8000/docs`。
-重置全部数据：`python seed.py --reset`（执行 `schema.sql` 删表重建）。
-
-### 2. 构建并运行前端
-
-本仓库依赖已安装。Node 便携版路径（本机未加入 PATH）：`C:\Users\daoyou\.local\nodejs\node.exe`。
-
-```powershell
-# 微信小程序（产物输出到 dist-weapp/，与 H5 的 dist/ 隔离）
-$env:TARO_OUTPUT_DIR='dist-weapp'
-npm run build:weapp          # 一次性构建；持续监听用 npm run dev:weapp
-
-# H5 预览（产物 dist/，走内置 Mock，无需后端）
-npm run dev:h5
-```
-
-### 3. 微信开发者工具
-
-1. 导入项目根目录 `e:\carpools`（AppID `wxd443dc3d7874b7a8`，`project.config.json` 已指向 `dist-weapp/`）。
-2. 详情 → 本地设置 → 勾选「不校验合法域名、web-view、TLS 以及 HTTPS 证书」（`urlCheck:false` 已写入配置）。
-3. 每次重新构建后点「编译」。后端地址配置在 [src/config/index.ts](src/config/index.ts)：
-   - 模拟器调试：`http://127.0.0.1:8000`
-   - 真机调试：改为电脑局域网 IP，如 `http://10.13.27.209:8000`（手机与电脑同一 Wi-Fi；换网后 IP 会变），并放行防火墙 8000 端口，然后用工具栏「**真机调试**」推送（预览包会拦截 HTTP 局域网请求）。
-
-### 4. 测试账号（免填写姓名，已带信用分与历史行程）
-
-登录页「测试账号一键登录」卡片直接点选；接口方式 `POST /api/login`，body `{"testAccount":"test1"}`。
-
-| 参数 | 昵称 | 真实姓名 |
-|---|---|---|
-| `test1` | 测试同学A | 张艺 |
-| `test2` | 测试同学B | 李一诺 |
-| `test3` | 测试同学C | 王星河 |
-
-新用户走正常注册：`{"realName":"张三"}`（头像昵称为选填）。
 
 ---
 
@@ -112,7 +132,7 @@ carpools/
 │   │   └── index.ts                  # 前后端共享的全部业务 TS 类型
 │   ├── utils/
 │   │   ├── format.ts                 # 时间/时长等展示格式化
-│   │   └── location.ts               # GCJ02 定位 + Haversine 200 米围栏距离校验
+│   │   ├── location.ts               # GCJ02 定位 + Haversine 300 米围栏距离校验
 │   ├── styles/
 │   │   ├── variables.scss            # 设计变量：颜色/字号/间距/圆角/阴影/mixin
 │   │   ├── theme.scss                # 语义化主题类（按钮、卡片、徽章等）
@@ -176,7 +196,7 @@ carpools/
 │
 ├── types/global.d.ts                 # 全局 TS 声明（defineAppConfig 等编译辅助）
 ├── config/                           # Taro 构建配置
-│   ├── index.ts                      # 公共配置：输出目录(TARO_OUTPUT_DIR)、webpack '@' 别名、CSS Modules
+│   ├── index.ts                      # 公共配置：输出目录（weapp→dist-weapp / h5→dist，按 TARO_ENV 自动分流）、webpack '@' 别名、CSS Modules
 │   ├── dev.ts                        # 开发环境覆盖项
 │   └── prod.ts                       # 生产环境覆盖项
 ├── babel.config.js                   # Babel 配置（babel-preset-taro）
@@ -217,4 +237,4 @@ New-NetFirewallRule -DisplayName "carpool-8000" -Direction Inbound -Protocol TCP
 
 ## 六、已知边界（当前版本未实现）
 
-WebSocket 实时推送（现用轮询）、真实微信 `wx.login` 换 openid、GPS 服务端复核（目前仅前端 200 米校验）、管理员后台（举报仅落库待处理）、预约拼车/等待时间预测。
+WebSocket 实时推送（现用轮询）、真实微信 `wx.login` 换 openid、GPS 服务端复核（目前仅前端 300 米校验）、管理员后台（举报仅落库待处理）、预约拼车/等待时间预测。

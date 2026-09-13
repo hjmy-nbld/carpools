@@ -1,51 +1,5 @@
 # 同路人 · Python 后端说明
 
-## 启动操作手册
-
-### 1. 首次安装（仅一次）
-
-```bash
-cd backend
-python -m venv .venv
-.venv\Scripts\activate      # Windows
-pip install -r requirements.txt
-python seed.py               # 建表 + 种子数据（首次需先 CREATE DATABASE carpool）
-```
-
-### 2. 启动后端（每次开机都要做）
-
-双击 `run.bat`，或命令行：
-
-```bash
-cd backend
-python run.py
-```
-
-看到 `[OK] MySQL 连接正常` + `Uvicorn running on 0.0.0.0:8000` 即启动成功。
-
-> MySQL 未启动时会退出并提示「服务未启动」，先在 Windows 服务中启动 MySQL（服务名通常为 `MySQL80`）。
-
-### 3. 配置前端地址（仅网络环境变化时改）
-
-修改 [../src/config/index.ts](../src/config/index.ts) 的 `API_BASE_URL`：
-
-- 微信开发者工具模拟器：`http://127.0.0.1:8000`
-- 手机真机调试：`http://电脑局域网IP:8000`（先 `ipconfig` 查电脑 IP，再用手机浏览器打开 `http://电脑IP:8000/docs` 验证连通）
-
-改完执行 `npm.cmd run build:weapp` 重新编译。
-
-### 4. 常用命令速查
-
-| 操作 | 命令 |
-|---|---|
-| 启动后端 | `python run.py` |
-| 重置数据 | `python seed.py --reset` |
-| 接口文档 | 浏览器打开 `http://127.0.0.1:8000/docs` |
-| 健康检查 | `http://127.0.0.1:8000/api/health` |
-| 3 个测试账号 | 登录页点击「测试账号一键登录」或接口 `POST /api/login {"testAccount":"test1"}` |
-
----
-
 校园拼车小程序的 Python 后端实现，替代/并行于微信云开发：基于 **FastAPI + SQLAlchemy + MySQL**，提供与前端 16 个云函数同名同契约的 HTTP 接口，前端切换一个配置即可从「云开发/Mock 模式」切到「Python 后端模式」。
 
 ---
@@ -63,43 +17,7 @@ python run.py
 
 ---
 
-## 二、快速开始（Windows / macOS / Linux）
-
-要求 Python 3.10+（本机已验证 Python 3.13）。
-
-```bash
-# 1. 进入后端目录
-cd backend
-
-# 2. （建议）创建虚拟环境
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-# source .venv/bin/activate
-
-# 3. 安装依赖
-pip install -r requirements.txt
-
-# 4. 建表 + 写入种子数据（幂等，可重复执行）
-python seed.py
-# 如需清空重来：python seed.py --reset
-
-# 5. 启动服务（二选一）
-python run.py
-# 或：uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-# Windows 用户也可直接双击 run.bat
-```
-
-启动成功后：
-
-- 服务地址：`http://127.0.0.1:8000`
-- 健康检查：`http://127.0.0.1:8000/api/health`
-- 接口文档（Swagger）：`http://127.0.0.1:8000/docs`
-
----
-
-## 三、3 个测试账号与注册说明
+## 二、3 个测试账号与注册说明
 
 ### 注册（新用户）
 
@@ -122,7 +40,7 @@ python run.py
 
 ---
 
-## 四、数据库
+## 三、数据库
 
 ### 生成方式
 
@@ -171,7 +89,7 @@ python run.py
 
 ---
 
-## 五、接口一览
+## 四、接口一览
 
 所有业务接口均为 `POST /api/<名称>`，请求体为 JSON，鉴权接口需带请求头 `Authorization: Bearer <token>`，统一返回：
 
@@ -204,7 +122,7 @@ python run.py
 
 ---
 
-## 六、匹配引擎说明
+## 五、匹配引擎说明
 
 逻辑位于 [app/matching.py](app/matching.py)，由发起与轮询接口共同驱动：
 
@@ -215,7 +133,7 @@ python run.py
 
 ---
 
-## 七、与前端如何对接
+## 六、与前端如何对接
 
 前端通过开关切换运行模式，见 [../src/config/index.ts](../src/config/index.ts)：
 
@@ -242,7 +160,7 @@ export const API_BASE_URL = 'http://127.0.0.1:8000'
 
 ---
 
-## 八、目录结构
+## 七、目录结构
 
 ```text
 backend/
@@ -267,7 +185,7 @@ backend/
 
 ---
 
-## 九、常见问题
+## 八、常见问题
 
 **Q：接口返回「未登录或登录已失效」？**
 A：调 `/api/login`（注册带 `realName`，或带 `testAccount`），从响应头取 `X-Auth-Token`，之后请求都带上 `Authorization: Bearer <token>`。前端会自动处理。

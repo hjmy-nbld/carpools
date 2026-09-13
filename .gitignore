@@ -24,3 +24,4 @@ backend/**/__pycache__/
 # ===== 依赖锁文件（保留，用于团队复现版本）=====
 # package-lock.json  /  不要注释掉这行
 # backend/requirements.txt 已在版本控制内
+node_modules
