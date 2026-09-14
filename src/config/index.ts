@@ -9,8 +9,8 @@
 //   微信开发者工具模拟器用 127.0.0.1；手机真机调试请改为电脑在当前网络下的 IP（手机热点也可以）
 //   切换网络后务必：1) ipconfig 确认电脑 IP；2) 手机浏览器打开 http://电脑IP:8000/docs 验证连通；
 //                  3) 重新编译后再点「真机调试」（「预览」模式不允许 HTTP 明文地址）
-//export const API_BASE_URL = 'http://10.13.27.209:8000'//手机热点联调地址
-export const API_BASE_URL = 'http://10.4.41.6:8000'//（电脑当前局域网 IP）
+export const API_BASE_URL = 'http://10.13.27.209:8000'//手机热点联调地址
+//export const API_BASE_URL = 'http://10.4.31.227:8000'//（电脑当前局域网 IP）
 
 export const API_ENABLED = !!API_BASE_URL
 

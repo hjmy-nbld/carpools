@@ -203,22 +203,6 @@
   box-shadow: 0 8rpx 24rpx rgba(8, 145, 178, 0.25);
 }
 
-.dirCardIcon {
-  position: absolute;
-  right: 28rpx;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0.28;
-}
-
-.dirCardIconText {
-  font-size: 88rpx;
-  font-weight: $font-weight-bold;
-  color: #fff;
-  letter-spacing: 4rpx;
-  line-height: 1;
-}
-
 .dirCardTitle {
   font-size: 40rpx;
   font-weight: $font-weight-bold;

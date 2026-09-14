@@ -140,9 +140,6 @@ export default function HomePage() {
         <View className={styles.directionGrid}>
           {/* 地铁站 → 学校 */}
           <View className={`${styles.dirCard} ${styles.dirCardMetro}`} onClick={() => goPublish('metro2school')}>
-            <View className={styles.dirCardIcon}>
-              <Text className={styles.dirCardIconText}>地铁</Text>
-            </View>
             <View>
               <View className={styles.dirCardTitle}>地铁站 → 学校</View>
               <View className={styles.dirCardSub}>下了地铁直接拼，到校门口更快更省</View>
@@ -155,9 +152,6 @@ export default function HomePage() {
 
           {/* 学校 → 地铁站 */}
           <View className={`${styles.dirCard} ${styles.dirCardSchool}`} onClick={() => goPublish('school2metro')}>
-            <View className={styles.dirCardIcon}>
-              <Text className={styles.dirCardIconText}>校门</Text>
-            </View>
             <View>
               <View className={styles.dirCardTitle}>学校 → 地铁站</View>
               <View className={styles.dirCardSub}>校门口出发拼车，赶地铁不迟到</View>

@@ -47,4 +47,5 @@ if __name__ == "__main__":
     import uvicorn
 
     # 监听 0.0.0.0：开发者工具模拟器用 127.0.0.1，真机预览用电脑局域网 IP 均可访问
-    uvicorn.run("app.main:app", host="0.0.0.0", port=SERVER_PORT, reload=False)
+    # use_colors=False：旧版 cmd 控制台不支持 ANSI 颜色码，会显示成 [32m 乱码
+    uvicorn.run("app.main:app", host="0.0.0.0", port=SERVER_PORT, reload=False, use_colors=False)
