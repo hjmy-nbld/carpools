@@ -410,7 +410,7 @@ export default function PublishPage() {
             <Input
               className={styles.priceInput}
               type="digit"
-              placeholder="如：10"
+              placeholder="如：5"
               value={price}
               onInput={(e) => setPrice(e.detail.value)}
             />
@@ -422,7 +422,7 @@ export default function PublishPage() {
           <Text className={styles.formLabel}>等候位置</Text>
           <Input
             className={styles.formInput}
-            placeholder="如：出口旁 711 便利店门口"
+            placeholder="如：马路边"
             value={waitLocation}
             onInput={(e) => setWaitLocation(e.detail.value)}
             maxlength={40}
@@ -460,7 +460,7 @@ export default function PublishPage() {
         <View className={styles.switchRow}>
           <View>
             <Text className={styles.switchLabel}>保存本次信息为默认内容</Text>
-            <Text className={styles.switchHint}>下次发起拼车自动填充，减少重复输入</Text>
+            <Text className={styles.switchHint}>下次发起拼车自动填充</Text>
           </View>
           <Switch checked={saveAsDefault} color="#1e6fff" onChange={(e) => setSaveAsDefault(e.detail.value)} />
         </View>

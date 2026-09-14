@@ -16,12 +16,13 @@ import type { ChatMessage, ChatSession, CompleteRideResult, MessageType } from '
 import styles from './index.module.scss'
 
 const QUICK_PHRASES = [
-  '我已经到出口了',
-  '我穿黑色外套，背深色书包',
-  '稍等我 2 分钟',
-  '我在扶梯 / 便利店旁等你',
-  '看到你了，我招手！',
-  '就在这个位置上车吧'
+  '我这更便宜，我打车吧',
+  '你那更便宜，你打车吧',
+  '在南门出去右边的路边上车',
+  '我到路边了',
+  '我到校门口了',
+  '不好意思，稍等我 2 分钟',
+  '看到你了，招手的是我'  
 ]
 
 const POLL_INTERVAL = CHAT_POLL_INTERVAL

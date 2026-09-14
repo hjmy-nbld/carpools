@@ -1,7 +1,7 @@
 /**
  * 举报页面
  *
- * 选择举报原因（单选）、填写情况描述并上传最多 3 张图片证据，提交后由管理员匿名核实处理。
+ * 选择举报原因（单选）、填写情况描述并上传最多 5 张图片证据，提交后由管理员匿名核实处理。
  */
 import { useState } from 'react'
 import { View, Text, Textarea, Button, Image } from '@tarojs/components'
@@ -18,7 +18,7 @@ const REASONS = [
   { value: '其他违规行为', hint: '其他影响拼车安全的行为' }
 ]
 
-const MAX_IMAGES = 3
+const MAX_IMAGES = 5
 
 export default function ReportPage() {
   const [groupId, setGroupId] = useState('')

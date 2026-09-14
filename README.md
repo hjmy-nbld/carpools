@@ -235,6 +235,9 @@ Get-NetTCPConnection -LocalPort 8000 -State Listen | Stop-Process -Id { $_.Ownin
 New-NetFirewallRule -DisplayName "carpool-8000" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow -Profile Any
 ```
 
-## 六、已知边界（当前版本未实现）
+## 六、当前版本未实现
 
 WebSocket 实时推送（现用轮询）、真实微信 `wx.login` 换 openid、GPS 服务端复核（目前仅前端 300 米校验）、管理员后台（举报仅落库待处理）、预约拼车/等待时间预测。
+
+若主动点击“完成拼车”，则30分钟内不能再次发起拼车请求，另一人不受限。为防止有人误点“完成拼车”，在已匹配到同伴开始的10分钟内，不能点击“完成拼车”，再过20分钟后系统自动完成拼车，并标注此次为系统自动完成，此时双方再次发起均不受限。
+以上现测试阶段不作限制，方便测试。

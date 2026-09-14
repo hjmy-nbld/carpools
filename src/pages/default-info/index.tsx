@@ -76,7 +76,7 @@ export default function DefaultInfoPage() {
           <Text className={styles.formLabel}>默认等候位置</Text>
           <Input
             className={styles.formInput}
-            placeholder="如：出口旁 711 便利店门口"
+            placeholder="如：马路边"
             value={waitLocation}
             onInput={(e) => setWaitLocation(e.detail.value)}
             maxlength={40}
