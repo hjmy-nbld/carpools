@@ -56,7 +56,7 @@ python run.py         # 启动；双击 run.bat 等价
 校园网可能变更ip，需要ipconfig 查当前 IP
 
 Ctrl+C 停掉 Taro，重新 
-cd E:\carpools
+cd E:\carpools（项目文件夹）
 npm run dev:weapp（监听模式，进程常驻-开发期频繁改代码-需 Ctrl+C 重启才生效）
 
 微信开发者工具 → 清缓存 → 编译
@@ -69,6 +69,16 @@ npm.cmd run build:weapp （一次性构建，编译完退出-调试完验证/交
 ```powershell
 npm run build:weapp      # 产物输出 dist-weapp/；PowerShell 报「禁止运行脚本」先执行 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
+内网穿透
+1、IP更改为提供的合法域名
+2、mp.weixin.qq.com → 开发管理 → 开发设置 → 服务器域名，把 两处 都改成新域名：
+ request 合法域名 ：
+ uploadFile 合法域名 ：
+3、重新上传小程序到微信开发者工具
+4、手机端刷新
+5、管理后台（如需）https://5bb3e490.r28.cpolar.top/admin/（域名/admin/）
+登录账号：admin
+登录密码：admin123
 
 ### 4. 微信开发者工具
 

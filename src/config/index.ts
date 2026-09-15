@@ -10,7 +10,8 @@
 //   切换网络后务必：1) ipconfig 确认电脑 IP；2) 手机浏览器打开 http://电脑IP:8000/docs 验证连通；
 //                  3) 重新编译后再点「真机调试」（「预览」模式不允许 HTTP 明文地址）
 //export const API_BASE_URL = 'http://10.13.27.209:8000'//手机热点联调地址
-export const API_BASE_URL = 'http://10.4.31.227:8000'//（电脑当前局域网 IP）
+//export const API_BASE_URL = 'http://10.4.31.227:8000'//（电脑当前局域网 IP）
+export const API_BASE_URL = 'https://5bb3e490.r28.cpolar.top'//（内网穿透）
 
 export const API_ENABLED = !!API_BASE_URL
 
